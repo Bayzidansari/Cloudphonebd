@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Phone BD Browser</title>
+    <style>
+        /* CSS অংশ: ডিজাইন */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* হেডার */
+        header {
+            background-color: #0078d7;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* অ্যাড্রেস বার সেকশন */
+        .toolbar {
+            background: white;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .search-btn { background-color: #28a745; }
+        .bookmark-btn { background-color: #e67e22; }
+        .btn:active { opacity: 0.8; }
+
+        /* কুইক লিঙ্কস (শর্টকাট) */
+        .home-screen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+            flex-grow: 1;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        .link-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .link-card:hover { transform: scale(1.05); background: #eef2f7; }
+
+        .link-card img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 8px;
+        }
+
+        .link-card span {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* ওয়েব ভিউ ফ্রেম */
+        #web-container {
+            flex-grow: 1;
+            display: none; /* শুরুতে লুকানো থাকবে */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ফুটার */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>Browser</header>
+
+    <div class="toolbar">
+        <input type="text" id="url-input" placeholder="সার্চ করুন বা URL লিখুন...">
+        <div class="button-group">
+            <button class="btn search-btn" onclick="handleSearch()">Search</button>
+            <button class="btn bookmark-btn" onclick="addBookmark()">Bookmark +</button>
+        </div>
+    </div>
+
+    <div id="home-screen" class="home-screen">
+        <div class="link-card" onclick="openUrl('https://www.youtube.com')">
+            <img src="https://cdn-icons-png.flaticon.com/128/1384/1384060.png" alt="YouTube">
+            <span>YouTube</span>
+        </div>
+        <div class="link-card" onclick="openUrl('https://chatgpt.com')">
+            <img src="https://cdn-icons-png.flaticon.com/128/12222/12222560.png" alt="ChatGPT">
+            <span>ChatGPT</span>
+        </div>
+        <div class="link-card" onclick="openUrl('https://gemini.google.com')">
+            <img src="https://www.gstatic.com/lamda/images/favicon_v1_150160c1396651733219.png" alt="Gemini">
+            <span>Gemini</span>
+        </div>
+        <div class="link-card" onclick="openUrl('https://www.wikipedia.org')">
+            <img src="https://cdn-icons-png.flaticon.com/128/2534/2534885.png" alt="Wikipedia">
+            <span>Wikipedia</span>
+        </div>
+    </div>
+
+    <div id="web-container">
+        <iframe src="" id="browser-iframe"></iframe>
+    </div>
+
+    <footer>
+        Owner By (Cloud Phone BD)
+    </footer>
+
+    <script>
+        /* JavaScript অংশ: কাজের লজিক */
+        const homeScreen = document.getElementById('home-screen');
+        const webContainer = document.getElementById('web-container');
+        const iframe = document.getElementById('browser-iframe');
+        const urlInput = document.getElementById('url-input');
+
+        // URL লোড করার ফাংশন
+        function openUrl(url) {
+            homeScreen.style.display = 'none'; // হোম স্ক্রিন লুকান
+            webContainer.style.display = 'block'; // ওয়েব ফ্রেম দেখান
+            urlInput.value = url;
+            iframe.src = url;
+        }
+
+        // সার্চ বাটন ফাংশন
+        function handleSearch() {
+            let query = urlInput.value.trim();
+            if (query !== "") {
+                if (query.includes('.') && !query.includes(' ')) {
+                    if (!query.startsWith('http')) query = 'https://' + query;
+                    openUrl(query);
+                } else {
+                    openUrl('https://www.google.com/search?q=' + encodeURIComponent(query));
+                }
+            }
+        }
+
+        // বুকমার্ক বাটন (সিম্পল অ্যালার্ট)
+        function addBookmark() {
+            let currentUrl = urlInput.value;
+            if (currentUrl) {
+                alert("বুকমার্ক সেভ করা হয়েছে: " + currentUrl);
+            } else {
+                alert("প্রথমে একটি ওয়েবসাইট ওপেন করুন!");
+            }
+        }
+
+        // এন্টার চাপলে সার্চ হবে
+        urlInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                handleSearch();
+            }
+        });
+    </script>
+</body>
+</html>
+
